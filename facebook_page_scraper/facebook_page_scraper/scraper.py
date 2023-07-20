@@ -8,6 +8,7 @@ import csv
 import os
 import time
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 format = logging.Formatter(
@@ -78,22 +79,44 @@ class Facebook_scraper:
         name = Finder._Finder__find_name(
             self.__driver, self.__layout)  # find name element
 
+        previous_run = 0
         while len(self.__data_dict) < self.posts_count:
+            print(f"datadict: {len(self.__data_dict)}")
             self.__handle_popup(self.__layout)
-            self.__find_elements(name)
+            self.__find_elements(name, start_date, end_date)
             current_time = time.time()
             if self.__check_timeout(starting_time, current_time) is True:
                 logger.setLevel(logging.INFO)
                 logger.info('Timeout...')
                 break
+            
+            # utilities_scroll_down time stamp
             Utilities._Utilities__scroll_down(
                 self.__driver, self.__layout)  # scroll down
+            
+            if len(self.__data_dict) == previous_run:
+                print(f"Found the number {previous_run} again!")
+                break
+            else:
+                previous_run = len(self.__data_dict)
+
             time.sleep(1)
+        
+        # Check if the data is empty
+            if not self.__data_dict:
+                logger.info("No data to scrape")
+                break
+
+        print("End post amount: ", len(self.__data_dict))
         # close the browser window after job is done.
         Utilities._Utilities__close_driver(self.__driver)
-        # dict trimming, might happen that we find more posts than it was asked, so just trim it
-        self.__data_dict = dict(list(self.__data_dict.items())[
-                                0:int(self.posts_count)])
+        
+
+        # Sort the data_dict by posted_on date in ascending order
+        sorted_dict = dict(sorted(self.__data_dict.items(), key=lambda x: x[1]['posted_on']))
+
+        # Trim the sorted_dict to the desired number of posts
+        sorted_dict = dict(list(sorted_dict.items())[:self.posts_count])
 
         return json.dumps(self.__data_dict, ensure_ascii=False)
 
@@ -131,27 +154,46 @@ class Facebook_scraper:
 
     def scrap_to_csv(self, filename, directory=os.getcwd(), start_date=None, end_date=None):
         try:
-            data = self.scrap_to_json()  # get the data in JSON format from the same class method
+            data = self.scrap_to_json(start_date, end_date)  # get the data in JSON format from the same class method
+            json_data = json.loads(data)
+
+             # Check if the data is empty
+            if not json_data:
+                logger.info("No data to scrape")
+                return False
             # convert it and write to CSV
-            self.__json_to_csv(filename, json.loads(data), directory)
+            filtered_data = {key: value for key, value in json_data.items() if start_date and end_date and start_date <= datetime.strptime(value['posted_on'].split("T")[0], "%Y-%m-%d") <= end_date}
+            self.__json_to_csv(filename, filtered_data, directory)
+
+            #self.__json_to_csv(filename, json.loads(data), directory)
             return True
         except Exception as ex:
             logger.exception('Error at scrap_to_csv : {}'.format(ex))
             return False
 
+    # def __remove_duplicates(self, all_posts):
+    #     """takes a list of posts and removes duplicates from it and returns the list"""
+    #     if len(self.__extracted_post) == 0:  # if self.__extracted_post is empty that means it is first extraction
+    #         # if it does than just add all the elements from the lists to __extracted_post set()
+    #         self.__extracted_post.update(all_posts)
+    #         return all_posts  # return the all_posts without any changes as it is first time and no duplicate is present
+    #     else:
+    #         # if self.extracted posts have some element than compare it with all_posts's element and return a new list containing new element
+    #         removed_duplicated = [
+    #             post for post in all_posts if post not in self.__extracted_post]
+    #         # after removing duplicates, add all those new element to extracted_posts, as it
+    #         self.__extracted_post.update(all_posts)
+    #         return removed_duplicated  # is set() it won't have duplicate elements
+
     def __remove_duplicates(self, all_posts):
-        """takes a list of posts and removes duplicates from it and returns the list"""
-        if len(self.__extracted_post) == 0:  # if self.__extracted_post is empty that means it is first extraction
-            # if it does than just add all the elements from the lists to __extracted_post set()
-            self.__extracted_post.update(all_posts)
-            return all_posts  # return the all_posts without any changes as it is first time and no duplicate is present
-        else:
-            # if self.extracted posts have some element than compare it with all_posts's element and return a new list containing new element
-            removed_duplicated = [
-                post for post in all_posts if post not in self.__extracted_post]
-            # after removing duplicates, add all those new element to extracted_posts, as it
-            self.__extracted_post.update(all_posts)
-            return removed_duplicated  # is set() it won't have duplicate elements
+        """Takes a list of posts and removes duplicates from it and returns the list"""
+        new_posts = []
+        for post in all_posts:
+            post_id = Finder._Finder__find_post_id(post)
+            if post_id not in self.__extracted_post:
+                new_posts.append(post)
+                self.__extracted_post.add(post_id)
+        return new_posts
 
     def __close_after_retry(self):
         """returns if class member retry is 0"""
@@ -163,123 +205,277 @@ class Facebook_scraper:
             # if length of posts is 0,decrement retry by 1
             self.retry -= 1
 
-    def __find_elements(self, name):
-        """find elements of posts and add them to data_dict"""
+    # print everything and figure out post amount count correctly
+    def __find_elements(self, name, start_date=None, end_date=None):
         all_posts = Finder._Finder__find_all_posts(
             self.__driver, self.__layout)  # find all posts
         all_posts = self.__remove_duplicates(
-            all_posts)  # remove duplicates from the list
+            all_posts)
+        
+          # remove duplicates from the list
         # iterate over all the posts and find details from the same
+        scraped_posts = 0
+        #previous_post_count = 0
         for post in all_posts:
             try:
-                # find post ID from post
-                status, post_url, link_element = Finder._Finder__find_status(
-                    post, self.__layout)
-                if post_url is None:
-                    continue
-                # find share from the post
-                shares = Finder._Finder__find_share(post, self.__layout)
-                # converting shares to number
-                # e.g if 5k than it should be 5000
-                shares = int(
-                    Scraping_utilities._Scraping_utilities__value_to_float(shares))
-                # find all reactions
-                reactions_all = Finder._Finder__find_reactions(post)
-                # find all anchor tags in reactions_all list
-                all_hrefs_in_react = Finder._Finder__find_reaction(self.__layout, reactions_all,) if type(
-                    reactions_all) != str else ""
-                # if hrefs were found
-                # all_hrefs contains elements like
-                # ["5 comments","54 Likes"] and so on
-                if type(all_hrefs_in_react) == list:
-                    l = [i.get_attribute("aria-label")
-                         for i in all_hrefs_in_react]
-                else:
-                    l = []
-                # extract that aria-label from all_hrefs_in_react list and than extract number from them seperately
-                # if Like aria-label is in the list, than extract it and extract numbers from that text
-
-                likes = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Like")
-
-                # if Love aria-label is in the list, than extract it and extract numbers from that text
-                loves = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Love")
-
-                # if Wow aria-label is in the list, than extract it and extract numbers from that text
-                wow = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Wow")
-
-                # if Care aria-label is in the list, than extract it and extract numbers from that text
-                cares = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Care")
-                # if Sad aria-label is in the list, than extract it and extract numbers from that text
-                sad = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Sad")
-                # if Angry aria-label is in the list, than extract it and extract numbers from that text
-                angry = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Angry")
-                # if Haha aria-label is in the list, than extract it and extract numbers from that text
-                haha = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
-                    l, "Haha")
-
-                # converting all reactions to numbers
-                # e,g reactions may contain counts like "5k","5m", so converting them to actual number
-                likes = Scraping_utilities._Scraping_utilities__value_to_float(
-                    likes)
-                loves = Scraping_utilities._Scraping_utilities__value_to_float(
-                    loves)
-                wow = Scraping_utilities._Scraping_utilities__value_to_float(
-                    wow)
-                cares = Scraping_utilities._Scraping_utilities__value_to_float(
-                    cares)
-                sad = Scraping_utilities._Scraping_utilities__value_to_float(
-                    sad)
-                angry = Scraping_utilities._Scraping_utilities__value_to_float(
-                    angry)
-                haha = Scraping_utilities._Scraping_utilities__value_to_float(
-                    haha)
-
-                reactions = {"likes": int(likes), "loves": int(loves), "wow": int(wow), "cares": int(cares), "sad": int(sad),
-                             "angry":
-                             int(angry), "haha": int(haha)}
-
-                # count number of total reactions
-                total_reaction_count = Scraping_utilities._Scraping_utilities__count_reaction(
-                    reactions)
-
-                comments = Finder._Finder__find_comments(post, self.__layout)
-                comments = int(
-                    Scraping_utilities._Scraping_utilities__value_to_float(comments))
-                post_content = Finder._Finder__find_content(
-                    post, self.__driver, self.__layout)
-                # extract time
-                posted_time = Finder._Finder__find_posted_time(
-                    post, self.__layout, link_element)
                 
-                # Skip posts outside the specified date range
-                if start_date and end_date and (posted_time < start_date or posted_time > end_date):
-                    continue
+                    # find post ID from post
+                    status, post_url, link_element = Finder._Finder__find_status(
+                        post, self.__layout)
+                    if post_url is None:
+                        continue
+                    # find share from the post
+                    shares = Finder._Finder__find_share(post, self.__layout)
+                    # converting shares to number
+                    # e.g if 5k than it should be 5000
+                    shares = int(
+                        Scraping_utilities._Scraping_utilities__value_to_float(shares))
+                    # find all reactions
+                    reactions_all = Finder._Finder__find_reactions(post)
+                    # find all anchor tags in reactions_all list
+                    all_hrefs_in_react = Finder._Finder__find_reaction(self.__layout, reactions_all,) if type(
+                        reactions_all) != str else ""
+                    # if hrefs were found
+                    # all_hrefs contains elements like
+                    # ["5 comments","54 Likes"] and so on
+                    if type(all_hrefs_in_react) == list:
+                        l = [i.get_attribute("aria-label")
+                            for i in all_hrefs_in_react]
+                    else:
+                        l = []
+                    # extract that aria-label from all_hrefs_in_react list and than extract number from them seperately
+                    # if Like aria-label is in the list, than extract it and extract numbers from that text
+                    likes = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Like")
 
-                video = Finder._Finder__find_video_url(post)
+                    # if Love aria-label is in the list, than extract it and extract numbers from that text
+                    loves = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Love")
 
-                image = Finder._Finder__find_image_url(post, self.__layout)
+                    # if Wow aria-label is in the list, than extract it and extract numbers from that text
+                    wow = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Wow")
 
-                #post_url = "https://www.facebook.com/{}/posts/{}".format(self.page_name,status)
+                    # if Care aria-label is in the list, than extract it and extract numbers from that text
+                    cares = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Care")
+                    # if Sad aria-label is in the list, than extract it and extract numbers from that text
+                    sad = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Sad")
+                    # if Angry aria-label is in the list, than extract it and extract numbers from that text
+                    angry = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Angry")
+                    # if Haha aria-label is in the list, than extract it and extract numbers from that text
+                    haha = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+                        l, "Haha")
 
-                self.__data_dict[status] = {
-                    "name": name,
-                    "shares": shares,
-                    "reactions": reactions,
-                    "reaction_count": total_reaction_count,
-                    "comments": comments,
-                    "content": post_content,
-                    "posted_on": posted_time,
-                    "video": video,
-                    "image": image,
-                    "post_url": post_url
+                    # converting all reactions to numbers
+                    # e,g reactions may contain counts like "5k","5m", so converting them to actual number
+                    likes = Scraping_utilities._Scraping_utilities__value_to_float(
+                        likes)
+                    loves = Scraping_utilities._Scraping_utilities__value_to_float(
+                        loves)
+                    wow = Scraping_utilities._Scraping_utilities__value_to_float(
+                        wow)
+                    cares = Scraping_utilities._Scraping_utilities__value_to_float(
+                        cares)
+                    sad = Scraping_utilities._Scraping_utilities__value_to_float(
+                        sad)
+                    angry = Scraping_utilities._Scraping_utilities__value_to_float(
+                        angry)
+                    haha = Scraping_utilities._Scraping_utilities__value_to_float(
+                        haha)
 
-                }
+                    reactions = {"likes": int(likes), "loves": int(loves), "wow": int(wow), "cares": int(cares), "sad": int(sad),
+                                "angry": int(angry), "haha": int(haha)}
+
+                    # count number of total reactions
+                    total_reaction_count = Scraping_utilities._Scraping_utilities__count_reaction(
+                        reactions)
+
+                    comments = Finder._Finder__find_comments(post, self.__layout)
+                    comments = int(
+                        Scraping_utilities._Scraping_utilities__value_to_float(comments))
+                    post_content = Finder._Finder__find_content(
+                        post, self.__driver, self.__layout)
+                    # extract time
+                    posted_time = Finder._Finder__find_posted_time(
+                        post, self.__layout, link_element)
+                    
+                    # Convert posted_time to a date object for comparison
+                    posted_date = datetime.strptime(posted_time.split("T")[0], "%Y-%m-%d") # Adjust the date format if needed
+                    if start_date and end_date and not (start_date <= posted_date <= end_date):
+                        continue
+                    
+
+                    video = Finder._Finder__find_video_url(post)
+                    image = Finder._Finder__find_image_url(post, self.__layout)
+
+                    self.__data_dict[status] = {
+                        "name": name,
+                        "shares": shares,
+                        "reactions": reactions,
+                        "reaction_count": total_reaction_count,
+                        "comments": comments,
+                        "content": post_content,
+                        "posted_on": posted_time,
+                        "video": video,
+                        "image": image,
+                        "post_url": post_url
+                    }
+                    scraped_posts += 1  # increment the counter for each scraped post
+                    print(f"scrapepost + {scraped_posts}")
+                    if scraped_posts >= self.posts_count:
+                        #print(f"self.post_count" + {self.posts_count})
+                        break  # break the loop if the desired number of posts have been scraped
+
             except Exception as ex:
                 logger.exception(
-                    "Error at find_elements method : {}".format(ex))
+                    "Error at find_elements method: {}".format(ex))
+        print("Scraped post amount: ", scraped_posts)
+
+        # Close the driver and handle other cleanup tasks
+        #Utilities._Utilities__close_driver(self.__driver)
+
+    # # print everything and figure out post amount count correctly
+    # def __find_elements(self, name, start_date=None, end_date=None):
+    #     all_posts = Finder._Finder__find_all_posts(
+    #         self.__driver, self.__layout)  # find all posts
+    #     all_posts = self.__remove_duplicates(
+    #         all_posts)
+        
+    #       # remove duplicates from the list
+    #     # iterate over all the posts and find details from the same
+    #     scraped_posts = 0
+    #     #previous_post_count = 0
+    #     while scraped_posts < self.posts_count:
+    #         try:
+    #             for post in all_posts:
+    #                 # find post ID from post
+    #                 status, post_url, link_element = Finder._Finder__find_status(
+    #                     post, self.__layout)
+    #                 if post_url is None:
+    #                     continue
+    #                 # find share from the post
+    #                 shares = Finder._Finder__find_share(post, self.__layout)
+    #                 # converting shares to number
+    #                 # e.g if 5k than it should be 5000
+    #                 shares = int(
+    #                     Scraping_utilities._Scraping_utilities__value_to_float(shares))
+    #                 # find all reactions
+    #                 reactions_all = Finder._Finder__find_reactions(post)
+    #                 # find all anchor tags in reactions_all list
+    #                 all_hrefs_in_react = Finder._Finder__find_reaction(self.__layout, reactions_all,) if type(
+    #                     reactions_all) != str else ""
+    #                 # if hrefs were found
+    #                 # all_hrefs contains elements like
+    #                 # ["5 comments","54 Likes"] and so on
+    #                 if type(all_hrefs_in_react) == list:
+    #                     l = [i.get_attribute("aria-label")
+    #                         for i in all_hrefs_in_react]
+    #                 else:
+    #                     l = []
+    #                 # extract that aria-label from all_hrefs_in_react list and than extract number from them seperately
+    #                 # if Like aria-label is in the list, than extract it and extract numbers from that text
+    #                 likes = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Like")
+
+    #                 # if Love aria-label is in the list, than extract it and extract numbers from that text
+    #                 loves = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Love")
+
+    #                 # if Wow aria-label is in the list, than extract it and extract numbers from that text
+    #                 wow = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Wow")
+
+    #                 # if Care aria-label is in the list, than extract it and extract numbers from that text
+    #                 cares = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Care")
+    #                 # if Sad aria-label is in the list, than extract it and extract numbers from that text
+    #                 sad = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Sad")
+    #                 # if Angry aria-label is in the list, than extract it and extract numbers from that text
+    #                 angry = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Angry")
+    #                 # if Haha aria-label is in the list, than extract it and extract numbers from that text
+    #                 haha = Scraping_utilities._Scraping_utilities__find_reaction_by_text(
+    #                     l, "Haha")
+
+    #                 # converting all reactions to numbers
+    #                 # e,g reactions may contain counts like "5k","5m", so converting them to actual number
+    #                 likes = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     likes)
+    #                 loves = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     loves)
+    #                 wow = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     wow)
+    #                 cares = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     cares)
+    #                 sad = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     sad)
+    #                 angry = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     angry)
+    #                 haha = Scraping_utilities._Scraping_utilities__value_to_float(
+    #                     haha)
+
+    #                 reactions = {"likes": int(likes), "loves": int(loves), "wow": int(wow), "cares": int(cares), "sad": int(sad),
+    #                             "angry": int(angry), "haha": int(haha)}
+
+    #                 # count number of total reactions
+    #                 total_reaction_count = Scraping_utilities._Scraping_utilities__count_reaction(
+    #                     reactions)
+
+    #                 comments = Finder._Finder__find_comments(post, self.__layout)
+    #                 comments = int(
+    #                     Scraping_utilities._Scraping_utilities__value_to_float(comments))
+    #                 post_content = Finder._Finder__find_content(
+    #                     post, self.__driver, self.__layout)
+    #                 # extract time
+    #                 posted_time = Finder._Finder__find_posted_time(
+    #                     post, self.__layout, link_element)
+                    
+    #                 # Convert posted_time to a date object for comparison
+    #                 posted_date = datetime.strptime(posted_time.split("T")[0], "%Y-%m-%d") # Adjust the date format if needed
+
+    #                 if start_date and end_date:
+    #                     print(f"startdate + {start_date}")
+    #                     print(f"enddate + {end_date}")
+    #                     if not (start_date <= posted_date <= end_date):
+    #                         continue
+
+    #                 video = Finder._Finder__find_video_url(post)
+    #                 image = Finder._Finder__find_image_url(post, self.__layout)
+
+    #                 self.__data_dict[status] = {
+    #                     "name": name,
+    #                     "shares": shares,
+    #                     "reactions": reactions,
+    #                     "reaction_count": total_reaction_count,
+    #                     "comments": comments,
+    #                     "content": post_content,
+    #                     "posted_on": posted_time,
+    #                     "video": video,
+    #                     "image": image,
+    #                     "post_url": post_url
+    #                 }
+    #                 scraped_posts += 1  # increment the counter for each scraped post
+    #                 print(f"scrapepost + {scraped_posts}")
+    #                 if scraped_posts >= self.posts_count:
+    #                     #print(f"self.post_count" + {self.posts_count})
+    #                     break  # break the loop if the desired number of posts have been scraped
+                
+    #             # previous_post_count = len(all_posts)
+    #             # print(f"previous post count + {previous_post_count}")
+    #             # Utilities._Utilities__scroll_down(self.__driver, self.__layout)  # scroll down
+    #             # time.sleep(1)
+    #             # all_posts = Finder._Finder__find_all_posts(
+    #             #     self.__driver, self.__layout)  # find all posts
+    #             # all_posts = self.__remove_duplicates(
+    #             #     all_posts)  # remove duplicates from the list
+    #             # if len(all_posts) == previous_post_count:
+    #             #     print(f"len(all_posts) + {len(all_posts)}")
+    #             #     # If no new posts are loaded, it means we have reached the bottom
+    #             #     break
+    #         except Exception as ex:
+    #             logger.exception(
+    #                 "Error at find_elements method: {}".format(ex))

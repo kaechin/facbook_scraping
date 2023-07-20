@@ -3,14 +3,16 @@
 from facebook_page_scraper import scraper
 from datetime import datetime
 
-start_date = datetime(2023, 7, 1)
-end_date = datetime(2023, 7, 10)
+start_date = datetime(2021, 11, 10)
+end_date = datetime(2023, 6, 1)
+# start_date = None
+# end_date = None
 
-page_list = ['arnold']
+page_list = ['tsudaoffcampus']
 
-proxy_port = 6211
+#proxy_port = 5578
 
-posts_count = 5
+posts_count = 20
 browser = "firefox"
 
 timeout = 600 #600 seconds
@@ -22,7 +24,9 @@ directory = "/Users/81701/Downloads/Facebook_Scraping"
 
 for page in page_list:
     #our proxy for this scrape
-    proxy = f'webscraping:webscraping1234@proxy_server{proxy_port}'
+    #proxy = f'webscraping:webscraping1234@proxy_server:{proxy_port}'
+    proxy = f'webscraping-rotate:webscraping1234@p.webshare.io:80'
+    #proxy = f'webscraping:webscraping1234@154.21.155.40:6483'
     #initializing a scraper
     scraper_instance = scraper.Facebook_scraper(page, posts_count, browser, proxy=proxy, timeout=timeout, headless=headless)
     
@@ -30,5 +34,5 @@ for page in page_list:
     filename = page
     scraper_instance.scrap_to_csv(filename, directory, start_date=start_date, end_date=end_date)
 
-    # Rotating our proxy to the next port so we could get a new IP and avoid blocks
-    proxy_port += 1
+    # # Rotating our proxy to the next port so we could get a new IP and avoid blocks
+    # proxy_port += 1
