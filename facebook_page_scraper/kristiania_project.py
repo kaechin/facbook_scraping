@@ -2,17 +2,20 @@
 
 from facebook_page_scraper import scraper
 from datetime import datetime
+# import os
 
-start_date = datetime(2021, 11, 10)
-end_date = datetime(2023, 6, 1)
+# os.remove("test.tsx")
+
+start_date = datetime(2023, 6, 1)
+end_date = datetime(2023, 7, 20)
 # start_date = None
 # end_date = None
 
-page_list = ['tsudaoffcampus']
+page_list = ['arnold']
 
 #proxy_port = 5578
 
-posts_count = 20
+posts_count = 10000
 browser = "firefox"
 
 timeout = 600 #600 seconds
