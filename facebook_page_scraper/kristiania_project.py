@@ -2,6 +2,8 @@
 
 from facebook_page_scraper import scraper
 from datetime import datetime
+
+# Need to delete the csv file, if you scrape same name's file
 # import os
 
 # os.remove("test.tsx")
