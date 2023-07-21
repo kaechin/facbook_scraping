@@ -171,30 +171,21 @@ class Facebook_scraper:
             logger.exception('Error at scrap_to_csv : {}'.format(ex))
             return False
 
-    # def __remove_duplicates(self, all_posts):
-    #     """takes a list of posts and removes duplicates from it and returns the list"""
-    #     if len(self.__extracted_post) == 0:  # if self.__extracted_post is empty that means it is first extraction
-    #         # if it does than just add all the elements from the lists to __extracted_post set()
-    #         self.__extracted_post.update(all_posts)
-    #         return all_posts  # return the all_posts without any changes as it is first time and no duplicate is present
-    #     else:
-    #         # if self.extracted posts have some element than compare it with all_posts's element and return a new list containing new element
-    #         removed_duplicated = [
-    #             post for post in all_posts if post not in self.__extracted_post]
-    #         # after removing duplicates, add all those new element to extracted_posts, as it
-    #         self.__extracted_post.update(all_posts)
-    #         return removed_duplicated  # is set() it won't have duplicate elements
-
     def __remove_duplicates(self, all_posts):
-        """Takes a list of posts and removes duplicates from it and returns the list"""
-        new_posts = []
-        for post in all_posts:
-            post_id = Finder._Finder__find_post_id(post)
-            if post_id not in self.__extracted_post:
-                new_posts.append(post)
-                self.__extracted_post.add(post_id)
-        return new_posts
+        """takes a list of posts and removes duplicates from it and returns the list"""
+        if len(self.__extracted_post) == 0:  # if self.__extracted_post is empty that means it is first extraction
+            # if it does than just add all the elements from the lists to __extracted_post set()
+            self.__extracted_post.update(all_posts)
+            return all_posts  # return the all_posts without any changes as it is first time and no duplicate is present
+        else:
+            # if self.extracted posts have some element than compare it with all_posts's element and return a new list containing new element
+            removed_duplicated = [
+                post for post in all_posts if post not in self.__extracted_post]
+            # after removing duplicates, add all those new element to extracted_posts, as it
+            self.__extracted_post.update(all_posts)
+            return removed_duplicated  # is set() it won't have duplicate elements
 
+    
     def __close_after_retry(self):
         """returns if class member retry is 0"""
         return self.retry <= 0
