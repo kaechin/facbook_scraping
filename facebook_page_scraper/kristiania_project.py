@@ -14,13 +14,13 @@ def delete_existing_file(directory, filename):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-start_date = datetime(2022, 11, 29)
-end_date = datetime(2023, 7, 20)
-# start_date = None
-# end_date = None
+start_date = datetime(2023, 7, 15)
+end_date = datetime.now()
+#start_date = None
+#end_date = None
 
-page_list = ['tsudaoffcampus']
-posts_count = 10000
+page_list = ['arnold']
+posts_count = 100
 browser = "firefox"
 timeout = 600 #600 seconds
 headless = False
