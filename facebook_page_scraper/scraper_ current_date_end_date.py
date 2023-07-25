@@ -58,9 +58,7 @@ class Facebook_scraper:
     def __check_timeout(self, start_time, current_time):
         return (current_time-start_time) > self.timeout
 
-    
-
-    def scrap_to_json(self, start_date=None, end_date=None, reverse_order=False):
+    def scrap_to_json(self, start_date=None, end_date=None):
         # call the __start_driver and override class member __driver to webdriver's instance
         self.__start_driver()
         starting_time = time.time()
@@ -91,11 +89,11 @@ class Facebook_scraper:
                 logger.setLevel(logging.INFO)
                 logger.info('Timeout...')
                 break
-
+            
             # utilities_scroll_down time stamp
             Utilities._Utilities__scroll_down(
                 self.__driver, self.__layout)  # scroll down
-
+            
             if len(self.__data_dict) == previous_run:
                 print(f"Found the number {previous_run} again!")
                 break
@@ -103,24 +101,24 @@ class Facebook_scraper:
                 previous_run = len(self.__data_dict)
 
             time.sleep(1)
-
+        
         # Check if the data is empty
-        if not self.__data_dict:
-            logger.info("No data to scrape")
-            return json.dumps(self.__data_dict, ensure_ascii=False)
+            if not self.__data_dict:
+                logger.info("No data to scrape")
+                break
 
         print("End post amount: ", len(self.__data_dict))
         # close the browser window after job is done.
         Utilities._Utilities__close_driver(self.__driver)
+        
 
         # Sort the data_dict by posted_on date in ascending order
-        sorted_dict = dict(sorted(self.__data_dict.items(), key=lambda x: x[1]['posted_on'], reverse=reverse_order))
+        sorted_dict = dict(sorted(self.__data_dict.items(), key=lambda x: x[1]['posted_on']))
 
         # Trim the sorted_dict to the desired number of posts
         sorted_dict = dict(list(sorted_dict.items())[:self.posts_count])
 
-        return json.dumps(sorted_dict, ensure_ascii=False)
-
+        return json.dumps(self.__data_dict, ensure_ascii=False)
 
     def __json_to_csv(self, filename, json_data, directory):
 
@@ -154,9 +152,9 @@ class Facebook_scraper:
 
             data_file.close()  # after writing close the file
 
-    def scrap_to_csv(self, filename, directory=os.getcwd(), start_date=None, end_date=None, reverse_order=False):
+    def scrap_to_csv(self, filename, directory=os.getcwd(), start_date=None, end_date=None):
         try:
-            data = self.scrap_to_json(start_date, end_date, reverse_order)  # get the data in JSON format from the same class method
+            data = self.scrap_to_json(start_date, end_date)  # get the data in JSON format from the same class method
             json_data = json.loads(data)
 
              # Check if the data is empty
@@ -164,8 +162,8 @@ class Facebook_scraper:
                 logger.info("No data to scrape")
                 return False
             # convert it and write to CSV
-            #filtered_data = {key: value for key, value in json_data.items() if start_date and end_date and start_date <= datetime.strptime(value['posted_on'].split("T")[0], "%Y-%m-%d") <= end_date}
-            self.__json_to_csv(filename, json_data, directory)
+            filtered_data = {key: value for key, value in json_data.items() if start_date and end_date and start_date <= datetime.strptime(value['posted_on'].split("T")[0], "%Y-%m-%d") <= end_date}
+            self.__json_to_csv(filename, filtered_data, directory)
 
             #self.__json_to_csv(filename, json.loads(data), directory)
             return True
@@ -326,4 +324,3 @@ class Facebook_scraper:
                 logger.exception(
                     "Error at find_elements method: {}".format(ex))
         print("Scraped post amount: ", scraped_posts)
-
