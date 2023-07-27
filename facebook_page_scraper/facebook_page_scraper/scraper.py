@@ -156,7 +156,7 @@ class Facebook_scraper:
 
     def scrap_to_csv(self, filename, directory=os.getcwd(), start_date=None, end_date=None, reverse_order=False):
         try:
-            data = self.scrap_to_json(start_date, end_date, reverse_order)  # get the data in JSON format from the same class method
+            data = self.scrap_to_json(start_date, end_date, )  # get the data in JSON format from the same class method
             json_data = json.loads(data)
 
              # Check if the data is empty
