@@ -114,6 +114,7 @@ class Facebook_scraper:
 
         # Sort the data_dict by posted_on date in ascending order
         sorted_dict = dict(sorted(self.__data_dict.items(), key=lambda x: x[1]['posted_on']))
+        #sorted_dict = dict(sorted(self.__data_dict.items(), key=lambda x: datetime.strptime(x[1]['posted_on'].split("T")[0], "%Y-%m-%d")))
 
         # Trim the sorted_dict to the desired number of posts
         sorted_dict = dict(list(sorted_dict.items())[:self.posts_count])

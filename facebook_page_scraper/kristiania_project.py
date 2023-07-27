@@ -15,14 +15,25 @@ def delete_existing_file(directory, filename):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-#start_date = datetime(2023, 7, 15)
-#end_date = datetime.now()
-start_date = None
-end_date = None
-reverse_order = True
+# Function to get a valid date input from the user
+def get_valid_date(prompt):
+    while True:
+        date_str = input(prompt)
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d")
+            return date
+        except ValueError:
+            print("Invalid date format. Please use YYYY-MM-DD format.")
+
+# Get the start date and end date from the user
+print("Enter the start date (YYYY-MM-DD):")
+start_date = get_valid_date("Start Date: ")
+
+print("For the end date, it will scrape today's date.")
+end_date = datetime.now()
 
 #page_list = ['arnold']
-#posts_count = 10
+posts_count = 1000
 
 # Function to get the valid page list from the user
 def get_valid_page_list():
@@ -38,7 +49,7 @@ def get_valid_page_list():
 
 # Get the page list from the user and split it into a list of pages
 page_name = get_valid_page_list()
-posts_count = int(input("Enter the number of posts you want to scrape: "))
+#posts_count = int(input("Enter the number of posts you want to scrape: "))
 
 browser = "firefox"
 timeout = 600 #600 seconds

@@ -122,7 +122,7 @@ while True:
         break
 
 # Create file names from user input
-user_data_file = user_name + '_specific_date.csv'
+user_data_file = user_name + '.csv'
 user_hashtag_file = user_name + '_hashtag.csv'
 
 # Load data
