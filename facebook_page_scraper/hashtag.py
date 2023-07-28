@@ -1,110 +1,3 @@
-# import pandas as pd
-# import re
-# import os
-
-# # Load data
-# df = pd.read_csv('arnold.csv')
-
-# # Get all unique hashtags from 'content' column
-# all_hashtags = set(re.findall(r'@(\w+)', ' '.join(df['content'])))
-
-# while True:
-#     # User input for multiple hashtags (comma-separated)
-#     hashtag_names = input('Write comma-separated hashtag keywords that you want to retrieve: ').strip()
-
-#     if hashtag_names == "":
-#         print("Please enter a hashtag. Do not press the enter key without typing any hashtag.")
-#         continue
-
-#     # Convert the input string to a list of hashtags
-#     hashtag_list = [hashtag.strip() for hashtag in hashtag_names.split(',')]
-
-#     # Check if all input hashtags are in 'content'
-#     if not all(hashtag in all_hashtags for hashtag in hashtag_list):
-#         invalid_hashtags = [hashtag for hashtag in hashtag_list if hashtag not in all_hashtags]
-#         print(f"The hashtag(s) {', '.join(invalid_hashtags)} is/are not in the list. Please enter a different hashtag.")
-#         continue
-
-#     break
-
-# # Function to check if any of the hashtags exists in the 'content' field
-# def find_hashtags(x):
-#     hashtags_in_content = []
-#     for hashtag in hashtag_list:
-#         if re.search(f"@{hashtag}", x):   
-#             hashtags_in_content.append(hashtag)
-#     return ', '.join(hashtags_in_content) if hashtags_in_content else ""
-
-# # Find rows where 'content' field contains any of the hashtags
-# df['hashtag_name'] = df['content'].apply(find_hashtags)
-
-# # Filter rows with at least one of the specified hashtags
-# df_hashtag = df[df['hashtag_name'].astype(bool)]   # changed this line to filter non-empty lists
-
-# # Delete the file if it exists
-# if os.path.exists('arnold_hashtag.csv'):
-#     os.remove('arnold_hashtag.csv')
-
-# # Write to new CSV
-# df_hashtag.to_csv('arnold_hashtag.csv', index=False)
-
-# import pandas as pd
-# import re
-# import os
-
-# # User input for username
-# user_name = input('Please enter user name which you would like to get hashtag data: ').strip()
-
-# # Create file names from user input
-# user_data_file = user_name + '.csv'
-# user_hashtag_file = user_name + '_hashtag.csv'
-
-# # Load data
-# df = pd.read_csv(user_data_file)
-
-# # Get all unique hashtags from 'content' column
-# all_hashtags = set(re.findall(r'@(\w+)', ' '.join(df['content'])))
-
-# while True:
-#     # User input for multiple hashtags (comma-separated)
-#     hashtag_names = input('Write comma-separated hashtag keywords that you want to retrieve: ').strip()
-
-#     if hashtag_names == "":
-#         print("Please enter a hashtag. Do not press the enter key without typing any hashtag.")
-#         continue
-
-#     # Convert the input string to a list of hashtags
-#     hashtag_list = [hashtag.strip() for hashtag in hashtag_names.split(',')]
-
-#     # Check if all input hashtags are in 'content'
-#     if not all(hashtag in all_hashtags for hashtag in hashtag_list):
-#         invalid_hashtags = [hashtag for hashtag in hashtag_list if hashtag not in all_hashtags]
-#         print(f"The hashtag(s) {', '.join(invalid_hashtags)} is/are not in the list. Please enter a different hashtag.")
-#         continue
-
-#     break
-
-# # Function to check if any of the hashtags exists in the 'content' field
-# def find_hashtags(x):
-#     hashtags_in_content = []
-#     for hashtag in hashtag_list:
-#         if re.search(f"@{hashtag}", x):   
-#             hashtags_in_content.append(hashtag)
-#     return ', '.join(hashtags_in_content) if hashtags_in_content else ""
-
-# # Find rows where 'content' field contains any of the hashtags
-# df['hashtag_name'] = df['content'].apply(find_hashtags)
-
-# # Filter rows with at least one of the specified hashtags
-# df_hashtag = df[df['hashtag_name'].astype(bool)]   # changed this line to filter non-empty lists
-
-# # Delete the file if it exists
-# if os.path.exists(user_hashtag_file):
-#     os.remove(user_hashtag_file)
-
-# # Write to new CSV
-# df_hashtag.to_csv(user_hashtag_file, index=False)
-
 import pandas as pd
 import re
 import os
@@ -129,40 +22,80 @@ user_hashtag_file = user_name + '_hashtag.csv'
 df = pd.read_csv(user_data_file)
 
 # Get all unique hashtags from 'content' column
-all_hashtags = set(re.findall(r'@(\w+)', ' '.join(df['content'])))
+df['content'] = df['content'].astype(str)   # Convert the 'content' column to str type
+all_hashtags_at = set(re.findall(r'@(\w+)', ' '.join(df['content'])))
+all_hashtags_hash = set(re.findall(r'#(\w+)', ' '.join(df['content'])))
 
-while True:
-    # User input for multiple hashtags (comma-separated)
-    hashtag_names = input('Write comma-separated hashtag keywords that you want to retrieve: ').strip()
+# Checking if the file has no @ or #
+if not all_hashtags_at and not all_hashtags_hash:
+    print("The file does not contain any @ or #. Please use a different file.")
+    os._exit(0)
 
-    if not hashtag_names:
-        print("Please enter a hashtag. Do not press the enter key without typing any hashtag.")
-        continue
+# If the file has only one of @ or #, guide the user accordingly
+if not all_hashtags_at:
+    print("The file does not contain any @. You can only provide # as input.")
+elif not all_hashtags_hash:
+    print("The file does not contain any #. You can only provide @ as input.")
 
-    # Convert the input string to a list of hashtags
-    hashtag_list = [hashtag.strip() for hashtag in hashtag_names.split(',')]
+# User input for multiple @ hashtags (comma-separated)
+if all_hashtags_at:
+    while True:
+        at_hashtag_names = input('Please enter at mark (@). Do not press the enter key without typing any hashtag: ').strip()
+        if not at_hashtag_names:
+            print("Please enter an at mark (@) hashtag.")
+            continue
 
-    # Check if all input hashtags are in 'content'
-    if not all(hashtag in all_hashtags for hashtag in hashtag_list):
-        invalid_hashtags = [hashtag for hashtag in hashtag_list if hashtag not in all_hashtags]
-        print(f"The hashtag(s) {', '.join(invalid_hashtags)} is/are not in the list. Please enter a different hashtag.")
-        continue
+        # Convert the input string to a list of @ hashtags
+        at_hashtag_list = [hashtag.strip() for hashtag in at_hashtag_names.split(',')]
 
-    break
+        # Check if all input @ hashtags are in 'content'
+        if not all(hashtag in all_hashtags_at for hashtag in at_hashtag_list):
+            invalid_hashtags = [hashtag for hashtag in at_hashtag_list if hashtag not in all_hashtags_at]
+            print(f"The at mark (@) hashtag(s) {', '.join(invalid_hashtags)} is/are not in the list. Please enter a different at mark (@) hashtag.")
+            continue
+
+        break
+else:
+    at_hashtag_list = []
+
+# User input for multiple # hashtags (comma-separated)
+if all_hashtags_hash:
+    while True:
+        hash_hashtag_names = input('Please enter hashtag (#). Do not press the enter key without typing any hashtag: ').strip()
+        if not hash_hashtag_names:
+            print("Please enter a hashtag (#).")
+            continue
+
+        # Convert the input string to a list of # hashtags
+        hash_hashtag_list = [hashtag.strip() for hashtag in hash_hashtag_names.split(',')]
+
+        # Check if all input # hashtags are in 'content'
+        if not all(hashtag in all_hashtags_hash for hashtag in hash_hashtag_list):
+            invalid_hashtags = [hashtag for hashtag in hash_hashtag_list if hashtag not in all_hashtags_hash]
+            print(f"The hashtag(s) {', '.join(invalid_hashtags)} is/are not in the list. Please enter a different hashtag.")
+            continue
+
+        break
+else:
+    hash_hashtag_list = []
 
 # Function to check if any of the hashtags exists in the 'content' field
 def find_hashtags(x):
+    atmarks_in_content = []
     hashtags_in_content = []
-    for hashtag in hashtag_list:
-        if re.search(f"@{hashtag}", x):   
+    for hashtag in at_hashtag_list:
+        if re.search(f"@{hashtag}\\b", x):   
+            atmarks_in_content.append(hashtag)
+    for hashtag in hash_hashtag_list:
+        if re.search(f"#{hashtag}\\b", x):   
             hashtags_in_content.append(hashtag)
-    return ', '.join(hashtags_in_content) if hashtags_in_content else ""
+    return atmarks_in_content, hashtags_in_content
 
 # Find rows where 'content' field contains any of the hashtags
-df['hashtag_name'] = df['content'].apply(find_hashtags)
+df['atmark_name'], df['hashtag_name'] = zip(*df['content'].apply(find_hashtags))
 
-# Filter rows with at least one of the specified hashtags
-df_hashtag = df[df['hashtag_name'].astype(bool)]   # changed this line to filter non-empty lists
+# Filter rows with at least one of the specified hashtags or atmarks
+df_hashtag = df[df['atmark_name'].astype(bool) | df['hashtag_name'].astype(bool)]   # changed this line to filter non-empty lists
 
 # Delete the file if it exists
 if os.path.exists(user_hashtag_file):
