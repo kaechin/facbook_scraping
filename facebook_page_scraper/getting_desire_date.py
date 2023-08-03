@@ -1,85 +1,142 @@
+# import csv
 # import os
-# import pandas as pd
+# import datetime as dt
 
-# # Read the CSV file
-# df = pd.read_csv('arnold.csv')
+# # Prompt the user for the CSV file name
+# while True:
+#     input_file = input("Enter the name of the input CSV file: ")
+#     if not input_file:
+#         print("Please enter a valid CSV file name.")
+#     elif not os.path.isfile(f'{input_file}.csv'):
+#         print("The file does not exist. Please try again.")
+#     else:
+#         break
 
-# # Prompt the user for start and end dates
-# start_specific_date = input("Enter the start date in YYYY-MM-DD format: ")
-# end_specific_date = input("Enter the end date in YYYY-MM-DD format: ")
+# # Open the CSV file and read it into a list of dictionaries
+# with open(f'{input_file}.csv', 'r') as f:
+#     reader = csv.DictReader(f)
+#     data = list(reader)
 
-# # Convert the user inputs to datetime objects
-# start_date = pd.to_datetime(start_specific_date, errors='coerce')
-# end_date = pd.to_datetime(end_specific_date, errors='coerce')
+# # Convert 'posted_on' column to datetime and sort it in ascending order
+# for row in data:
+#     row['posted_on'] = dt.datetime.strptime(row['posted_on'].split('T')[0], "%Y-%m-%d")
 
-# # Modify the end date to be inclusive (add 1 day)
-# end_date = end_date + pd.DateOffset(days=1)
+# # Sort data by date
+# data.sort(key=lambda x: x['posted_on'])
 
-# # Filter the data based on the specified date range
-# df['posted_on'] = pd.to_datetime(df['posted_on'], errors='coerce')  # Convert the 'posted_on' column to datetime
-# filtered_df = df[(df['posted_on'] >= start_date) & (df['posted_on'] < end_date)]  # Use '<' for the end date comparison
+# # Display the min and max dates in the 'posted_on' column after conversion to datetime
+# print("After conversion:")
+# print(f"Earliest date: {data[0]['posted_on'].strftime('%Y-%m-%d')}")
+# print(f"Latest date: {data[-1]['posted_on'].strftime('%Y-%m-%d')}")
+
+# filtered_data = []
+# while not filtered_data:
+#     # Prompt the user for start and end dates
+#     start_specific_date = input("Enter the start date in YYYY-MM-DD format: ")
+#     end_specific_date = input("Enter the end date in YYYY-MM-DD format: ")
+
+#     # Convert the user inputs to datetime objects
+#     start_date = dt.datetime.strptime(start_specific_date, "%Y-%m-%d")
+#     end_date = dt.datetime.strptime(end_specific_date, "%Y-%m-%d")
+
+#     # Filter the data based on the specified date range
+#     filtered_data = [row for row in data if start_date <= row['posted_on'] <= end_date]
+
+#     # Check if the filtered data is empty
+#     if not filtered_data:
+#         # If no data within the specified date range, suggest the user enter a date range within the available data range
+#         min_date = data[0]['posted_on'].strftime('%Y-%m-%d')
+#         max_date = data[-1]['posted_on'].strftime('%Y-%m-%d')
+#         print(f"No data found within the specified date range.")
+#         print(f"Please enter a date range between {min_date} and {max_date}.")
+
+# # Create the output CSV file name
+# output_file = f"{input_file}_specific_date.csv"
+
+# # Check if the output file already exists, and delete it if it does
+# if os.path.exists(output_file):
+#     os.remove(output_file)
+
+# # Write the filtered data to the new CSV file
+# with open(output_file, 'w', newline='') as f:
+#     writer = csv.DictWriter(f, fieldnames=filtered_data[0].keys())
+#     writer.writeheader()
+#     writer.writerows(filtered_data)
+
+# print(f"Filtered data has been saved to '{output_file}'.")
 
 
-# # Drop rows with invalid dates (NaT) if any
-# filtered_df = filtered_df.dropna(subset=['posted_on'])
 
-# # Check if the filtered dataframe is empty
-# if filtered_df.empty:
-#     # If no data within the specified date range, suggest the user to enter a date range within the available data range
-#     min_date = df['posted_on'].min().strftime('%Y-%m-%d')
-#     max_date = df['posted_on'].max().strftime('%Y-%m-%d')
-#     print(f"No data found within the specified date range.")
-#     print(f"Please enter a date range between {min_date} and {max_date}.")
-# else:
-#     # Save the filtered data to a new CSV file
-#     output_file = 'arnold_specific_date.csv'
-    
-#     # Check if the output file already exists, and delete it if it does
-#     if os.path.exists(output_file):
-#         os.remove(output_file)
-
-#     filtered_df.to_csv(output_file, index=False)
-#     print("Filtered data has been saved to 'arnold_specific_date.csv'.")
-
+import csv
 import os
-import pandas as pd
+import datetime as dt
 
-# Read the CSV file
-input_file = input("Enter the name of the input CSV file: ")
-df = pd.read_csv(f'{input_file}.csv')
+# Prompt the user for the CSV file name
+while True:
+    input_file = input("Enter the name of the input CSV file: ")
+    if not input_file:
+        print("Please enter a valid CSV file name.")
+    elif not os.path.isfile(f'{input_file}.csv'):
+        print("The file does not exist. Please try again.")
+    else:
+        break
 
-# Prompt the user for start and end dates
-start_specific_date = input("Enter the start date in YYYY-MM-DD format: ")
-end_specific_date = input("Enter the end date in YYYY-MM-DD format: ")
+# Open the CSV file and read it into a list of dictionaries
+with open(f'{input_file}.csv', 'r') as f:
+    reader = csv.DictReader(f)
+    data = list(reader)
 
-# Convert the user inputs to datetime objects
-start_date = pd.to_datetime(start_specific_date, errors='coerce')
-end_date = pd.to_datetime(end_specific_date, errors='coerce')
+# Convert 'posted_on' column to datetime and sort it in ascending order
+for row in data:
+    row['posted_on'] = dt.datetime.strptime(row['posted_on'].split('T')[0], "%Y-%m-%d")
 
-# Modify the end date to be inclusive (add 1 day)
-end_date = end_date + pd.DateOffset(days=1)
+# Sort data by date
+data.sort(key=lambda x: x['posted_on'])
 
-# Filter the data based on the specified date range
-df['posted_on'] = pd.to_datetime(df['posted_on'], errors='coerce')  # Convert the 'posted_on' column to datetime
-filtered_df = df[(df['posted_on'] >= start_date) & (df['posted_on'] < end_date)]  # Use '<' for the end date comparison
+# Display the min and max dates in the 'posted_on' column after conversion to datetime
+print("After conversion:")
+print(f"Earliest date: {data[0]['posted_on'].strftime('%Y-%m-%d')}")
+print(f"Latest date: {data[-1]['posted_on'].strftime('%Y-%m-%d')}")
 
-# Drop rows with invalid dates (NaT) if any
-filtered_df = filtered_df.dropna(subset=['posted_on'])
+filtered_data = []
+while not filtered_data:
+    # Prompt the user for start and end dates
+    while True:
+        start_specific_date = input("Enter the start date in YYYY-MM-DD format: ")
+        end_specific_date = input("Enter the end date in YYYY-MM-DD format: ")
 
-# Check if the filtered dataframe is empty
-if filtered_df.empty:
-    # If no data within the specified date range, suggest the user enter a date range within the available data range
-    min_date = df['posted_on'].min().strftime('%Y-%m-%d')
-    max_date = df['posted_on'].max().strftime('%Y-%m-%d')
-    print(f"No data found within the specified date range.")
-    print(f"Please enter a date range between {min_date} and {max_date}.")
-else:
-    # Create the output CSV file name
-    output_file = f"{input_file}_specific_date.csv"
+        # If user just hits enter without typing anything
+        if not start_specific_date or not end_specific_date:
+            print("Please provide both the start date and end date.")
+        else:
+            break
 
-    # Check if the output file already exists, and delete it if it does
-    if os.path.exists(output_file):
-        os.remove(output_file)
+    # Convert the user inputs to datetime objects
+    start_date = dt.datetime.strptime(start_specific_date, "%Y-%m-%d")
+    end_date = dt.datetime.strptime(end_specific_date, "%Y-%m-%d")
 
-    filtered_df.to_csv(output_file, index=False)
-    print(f"Filtered data has been saved to '{output_file}'.")
+    # Filter the data based on the specified date range
+    filtered_data = [row for row in data if start_date <= row['posted_on'] <= end_date]
+
+    # Check if the filtered data is empty
+    if not filtered_data:
+        # If no data within the specified date range, suggest the user enter a date range within the available data range
+        min_date = data[0]['posted_on'].strftime('%Y-%m-%d')
+        max_date = data[-1]['posted_on'].strftime('%Y-%m-%d')
+        print(f"No data found within the specified date range.")
+        print(f"Please enter a date range between {min_date} and {max_date}.")
+
+# Create the output CSV file name
+output_file = f"{input_file}_specific_date.csv"
+
+# Check if the output file already exists, and delete it if it does
+if os.path.exists(output_file):
+    os.remove(output_file)
+
+# Write the filtered data to the new CSV file
+with open(output_file, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=filtered_data[0].keys())
+    writer.writeheader()
+    writer.writerows(filtered_data)
+
+print(f"Filtered data has been saved to '{output_file}'.")

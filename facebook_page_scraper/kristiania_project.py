@@ -3,6 +3,7 @@
 
 from facebook_page_scraper import scraper
 from datetime import datetime
+from datetime import date
 import os
 import requests
 
@@ -32,8 +33,7 @@ start_date = get_valid_date("Start Date: ")
 print("For the end date, it will scrape today's date.")
 end_date = datetime.now()
 
-#page_list = ['arnold']
-posts_count = 1000
+posts_count = 10000
 
 # Function to get the valid page list from the user
 def get_valid_page_list():
