@@ -1,4 +1,4 @@
-import facebook_page_scraper
+import facebook_page_scraper_1
 import json
 import unittest
 import json
@@ -15,7 +15,7 @@ class Test_json(unittest.TestCase):
 
         
     def test_scraper_for_json(self): 
-        facebook_ai = facebook_page_scraper.Facebook_scraper("facebookai",10,"firefox")
+        facebook_ai = facebook_page_scraper_1.Facebook_scraper("facebookai",10,"firefox")
         json_data = facebook_ai.scrap_to_json()
         data_dictionary = json.loads(json_data)
         
@@ -27,7 +27,7 @@ class Test_json(unittest.TestCase):
 class Test_csv_output(unittest.TestCase):
     
     def test_csv(self):
-        facebook_ai = facebook_page_scraper.Facebook_scraper("facebookai",10,"firefox")
+        facebook_ai = facebook_page_scraper_1.Facebook_scraper("facebookai",10,"firefox")
         was_saved = facebook_ai.scrap_to_csv("fbai","E:\Programming")
         self.assertEqual(was_saved,True)
 
