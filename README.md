@@ -63,62 +63,77 @@ cd yourfolderpath/Facebook_Scraping/facebook_page_scraper/src/backend
 ```
 python .\app.py
 ```
+- Proxy
+1. Move to the kristiania=project.py
+
+```
+cd yourfolderpath/Facebook_Scraping/facebook_page_scraper/src/backend/kristiania_project.py
+```
+
+2. This system employs Webshare's Private Proxy through the process of registration and subscription. (It's important to note that if an alternative proxy service is utilized, there might be variations in the code implementation.)
+
+   Given the open-source nature of this project, sharing explicit proxy usernames and password codes within the codebase raises security concerns.Due to this particular concern, kindly verify the Proxy Username and Proxy Password by accessing the Webshare page, as illustrated in the attached photo.
+<img src="facebook_page_scraper\images\Proxy 1.jpg" style="margin: 15px">
+
+3. Use the details acquired in step 2 and input them into the "PROXY USERNAME" and "PROXYPASSWORD" fields within the "kristiania_project.py" file, as displayed in the photo.
+<img src="facebook_page_scraper\images\Proxy 2.jpg" style="margin: 15px">
+
 
 ## How to use the system
 
 1. Enter "http://localhost:3000/" into the Firefox browser.
 
 2. In the Scraping Facebook Data section, enter any Facebook page name in the Facebook page box.
- <img src="Facebook Scraping 1.jpg" style="margin: 15px">
+ <img src="facebook_page_scraper\images\Facebook Scraping 1.jpg" style="margin: 15px">
 
 3. Enter the desired Start Date in the Start Date field. 
    End Date automatically gathers data according to the system's execution date and time. In the Filtering Facebook Data section, you have the option to use this End Date to filter the data.
- <img src="Facebook Scraping 2.jpg" style="margin: 15px">
+ <img src="facebook_page_scraper\images\Facebook Scraping 2.jpg" style="margin: 15px">
 
 4. Click the Search button.
-<img src="Facebook Scraping 3.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 3.jpg" style="margin: 15px">
 
 5. Loading will be displayed while the system is scraping the Facebook page.
-<img src="Facebook Scraping 5.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 5.jpg" style="margin: 15px">
 
 6. When the scraping is finished, the message "Scrape done" is displayed.
-<img src="Facebook Scraping 6.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 6.jpg" style="margin: 15px">
 
 7. Click the DOWNLOAD PAGE CSV button.
-<img src="Facebook Scraping 7.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 7.jpg" style="margin: 15px">
 
 8. When the download is complete, the message "CSV Download Successfully!
-<img src="Facebook Scraping 8.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 8.jpg" style="margin: 15px">
 
 9. CSV file is generated in the Download of the local terminal. The picture shows a part of the data in arnold.csv.
-<img src="Facebook Scraping 16.jpg" style="margin: 30px">
+<img src="facebook_page_scraper\images\Facebook Scraping 16.jpg" style="margin: 30px">
 
 10. In the Filtering Facebook Data section, enter the name of the data obtained in the Scraping Facebook Data section in the Facebook page box.
-<img src="Facebook Scraping 9.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 9.jpg" style="margin: 15px">
 
 11. Enter the desired Start Date in the Start Date field.
-<img src="Facebook Scraping 10.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 10.jpg" style="margin: 15px">
 
 12. Enter the desired end date in the End Date field.
-<img src="Facebook Scraping 11.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 11.jpg" style="margin: 15px">
 
 13. @ Search box, # Enter the @ and # you wish to retrieve in the Search box.
-<img src="Facebook Scraping 12.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 12.jpg" style="margin: 15px">
 
 14. Click the Search button.
-<img src="Facebook Scraping 18.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 18.jpg" style="margin: 15px">
 
 15. When filtering is complete, the text "Hash data for Facebook page name has been extracted and saved to Facebook page name_hashtag.csv" will be displayed.
-<img src="Facebook Scraping 13.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 13.jpg" style="margin: 15px">
 
 16. Click the DOWNLOAD HASHTAG CSV button.
-<img src="Facebook Scraping 14.jpg" style="margin: 15px">
+<img src="facebook_page_scraper\images\Facebook Scraping 14.jpg" style="margin: 15px">
 
-17. When the download is complete, the message "CSV Downloaded Successfully!
-<img src="Facebook Scraping 15.jpg" style="margin: 15px">
+17. When the download is complete, the message "CSV Downloaded Successfully!"
+<img src="facebook_page_scraper\images\Facebook Scraping 15.jpg" style="margin: 15px">
 
 18. CSV file is generated in the Download of the local terminal. The picture shows part of the data in arnold_hashtag.csv.
-<img src="Facebook Scraping 17.jpg" style="margin: 30px">
+<img src="facebook_page_scraper\images\Facebook Scraping 17.jpg" style="margin: 30px">
 
 ## Future Work
 
