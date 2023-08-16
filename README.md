@@ -78,46 +78,43 @@ python .\app.py
 4. Loading will be displayed while the system is scraping the Facebook page.
 <img src="Facebook Scraping 5.jpg" style="margin: 15px">
 
-5. When the system runs, a Facebook page is automatically generated and scraped as shown in the picture. Do not click on the screen as all actions are automatic. The screen will close automatically.
-<img src="Facebook Scraping 4.jpg" style="margin: 15px">
-
-6. When the scraping is finished, the message "Scrape done" is displayed.
+5. When the scraping is finished, the message "Scrape done" is displayed.
 <img src="Facebook Scraping 6.jpg" style="margin: 15px">
 
-7. Click the DOWNLOAD PAGE CSV button.
+6. Click the DOWNLOAD PAGE CSV button.
 <img src="Facebook Scraping 7.jpg" style="margin: 15px">
 
-8. When the download is complete, the message "CSV Download Successfully!
+7. When the download is complete, the message "CSV Download Successfully!
 <img src="Facebook Scraping 8.jpg" style="margin: 15px">
 
-9. CSV file is generated in the Download of the local terminal. The picture shows a part of the data in arnold.csv.
+8. CSV file is generated in the Download of the local terminal. The picture shows a part of the data in arnold.csv.
 <img src="Facebook Scraping 16.jpg" style="margin: 30px">
 
-10. In the Filtering Facebook Data section, enter the name of the data obtained in the Scraping Facebook Data section in the Facebook page box.
+9. In the Filtering Facebook Data section, enter the name of the data obtained in the Scraping Facebook Data section in the Facebook page box.
 <img src="Facebook Scraping 9.jpg" style="margin: 15px">
 
-11. Enter the desired Start Date in the Start Date field.
+10. Enter the desired Start Date in the Start Date field.
 <img src="Facebook Scraping 10.jpg" style="margin: 15px">
 
-12. Enter the desired end date in the End Date field.
+11. Enter the desired end date in the End Date field.
 <img src="Facebook Scraping 11.jpg" style="margin: 15px">
 
-13. @ Search box, # Enter the @ and # you wish to retrieve in the Search box.
+12. @ Search box, # Enter the @ and # you wish to retrieve in the Search box.
 <img src="Facebook Scraping 12.jpg" style="margin: 15px">
 
-14. Click the Search button.
+13. Click the Search button.
 <img src="Facebook Scraping 18.jpg" style="margin: 15px">
 
-15. When filtering is complete, the text "Hash data for Facebook page name has been extracted and saved to Facebook page name_hashtag.csv" will be displayed.
+14. When filtering is complete, the text "Hash data for Facebook page name has been extracted and saved to Facebook page name_hashtag.csv" will be displayed.
 <img src="Facebook Scraping 13.jpg" style="margin: 15px">
 
-16. Click the DOWNLOAD HASHTAG CSV button.
+15. Click the DOWNLOAD HASHTAG CSV button.
 <img src="Facebook Scraping 14.jpg" style="margin: 15px">
 
-17. When the download is complete, the message "CSV Downloaded Successfully!
+16. When the download is complete, the message "CSV Downloaded Successfully!
 <img src="Facebook Scraping 15.jpg" style="margin: 15px">
 
-18. CSV file is generated in the Download of the local terminal. The picture shows part of the data in arnold_hashtag.csv.
+17. CSV file is generated in the Download of the local terminal. The picture shows part of the data in arnold_hashtag.csv.
 <img src="Facebook Scraping 17.jpg" style="margin: 30px">
 
 ## Future Work
