@@ -69,7 +69,8 @@ python .\app.py
 1. In the Scraping Facebook Data section, enter any Facebook page name in the Facebook page box.
  <img src="Facebook Scraping 1.jpg" style="margin: 15px">
 
-2. Enter the desired Start Date in the Start Date field.
+2. Enter the desired Start Date in the Start Date field. 
+   End Date automatically gathers data according to the system's execution date and time. In the Filtering Facebook Data section, you have the option to use this End Date to filter the data.
  <img src="Facebook Scraping 2.jpg" style="margin: 15px">
 
 3. Click the Search button.
