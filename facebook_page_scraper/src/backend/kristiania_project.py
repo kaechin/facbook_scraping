@@ -8,7 +8,7 @@ import os
 import requests
 
 # Make sure to create this folder
-directory = "csv_folder"
+directory = os.getcwd()
 if not os.path.exists(directory):
     os.makedirs(directory)
 
@@ -30,7 +30,6 @@ def get_valid_date(prompt):
             print("Invalid date format. Please use YYYY-MM-DD format.")
 
 
-
 # Function to get the valid page list from the user
 def get_valid_page_list():
     while True:
@@ -44,19 +43,12 @@ def get_valid_page_list():
             return page_list[0]
         
 def scrape(page_name, start_date):
-    # Get the start date and end date from the user
-    # print("Enter the start date (YYYY-MM-DD):")
-    # start_date = get_valid_date("Start Date: ")
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
 
     print("For the end date, it will scrape today's date.")
     end_date = datetime.now()
 
     posts_count = 10000
-
-    # Get the page list from the user and split it into a list of pages
-    #page_name = get_valid_page_list()
-    #posts_count = int(input("Enter the number of posts you want to scrape: "))
 
     browser = "firefox"
     timeout = 600 #600 seconds
@@ -68,14 +60,12 @@ def scrape(page_name, start_date):
     # Delete existing CSV file if it exists
     delete_existing_file(directory, page_name)
 
-    # Our proxy for this scrape
-    #proxy = f'webscraping-rotate:webscraping1234@p.webshare.io:80'
-    #proxy = f'webscraping:webscraping1234@154.21.155.40:6483'
+    # Connectiong to the proxy
     proxy = requests.get(
         "https://ipv4.webshare.io/",
         proxies={
-            "http": "http://webscraping-rotate:webscraping1234@p.webshare.io:80/",
-            "https": "http://webscraping-rotate:webscraping1234@p.webshare.io:80/"
+            "http": "http://PROXY USERNAME:PROXYPASS WORD@p.webshare.io:80/",
+            "https": "http://PROXY USERNAME:PROXYPASS WORD@p.webshare.io:80/"
         }
     ).text
 
