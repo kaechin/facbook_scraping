@@ -138,6 +138,7 @@ The Social Media Data Platform Aggregator (SMDPA) project has effectively develo
 
 ## Reference
 Rivera, Isabel. 2023. “How to Scrape Facebook.” Proxyway. March 20, 2023. https://proxyway.com/guides/how-to-scrape-facebook.
+
 Shaikh, Sajid. 2021. “Facebook Page Scraper.” GitHub. February 2, 2021. https://github.com/shaikhsajid1111/facebook_page_scraper/tree/master.
 
 
