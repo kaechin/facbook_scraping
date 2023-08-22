@@ -4,7 +4,7 @@
 
 The Social Media Data Platform Aggregator (SMDPA) project aims to create an advanced tool to overcome challenges posed by limited API access on Facebook. Inspired by CrowdTangle's discontinuation, this project focuses on developing a comprehensive data collection solution for Facebook Pages managed by companies and organizations. By utilizing ethical data practices, user-friendly design, and innovative web scraping techniques, SMDPA aims to empower researchers, analysts, and decision-makers with valuable insights into content and engagement trends. This bridge between restricted API access and data needs underscores the project's significance in the field of social media research and analysis.
 
-This research initiative was undertaken at Kristiania University College during the period spanning from May 1st to August 18th 2023. Notably, the project encompassed not only the domain of Facebook data scraping but also extended to the realm of Instagram scraping.
+This research initiative was undertaken at Kristiania University College during the period spanning from May 1st to August 18th 2023. Notably, the project encompassed not only the domain of Facebook data scraping but also extended to the realm of Instagram scraping. For more details about Instagram, please refer to this repository. https://github.com/Chonthichar/InstagramWebscraperApp
 
 ## Prerequisites
 - Internet Connection
